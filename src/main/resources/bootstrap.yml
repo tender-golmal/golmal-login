@@ -1,0 +1,30 @@
+server:
+  port: 8181
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka}
+    enabled: true
+spring:
+  application:
+    name: golmal-login
+  cloud:
+    config:
+      enabled: true
+      label: main
+      discovery:
+        service-id: GOLMAL-CONFIG-SERVER
+        enabled: true
+      fail-fast: true
+  profiles:
+    active: development
+  main:
+    web-application-type: reactive
+golmal:
+  login:
+    jwt:
+      secret: dsfs4rtfsvr
+      expirationMs: 86400000
+logging:
+  level:
+    org.springframework: DEBUG

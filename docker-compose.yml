@@ -1,0 +1,52 @@
+version: '3'
+services:
+  golmal-discovery:
+    image: sushantpat11/golmal-discovery:latest
+    ports:
+      - 8761:8761
+  golmal-mongodb:
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_DATABASE=golmaldb
+    volumes:
+      # seeding scripts
+      # named volumes
+      - mongodb:/data/db
+      - mongoconfig:/data/configdb
+  golmal-config-server:
+    image: sushantpat11/golmal-config-server:latest
+    ports:
+      - 8888:8888
+    depends_on:
+      - golmal-discovery
+    environment:
+      - JAVA_OPTS=
+        -DEUREKA_SERVER=http://golmal-discovery:8761/eureka
+  golmal-repo:
+    image: sushantpat11/golmal-repo
+    ports:
+      - 8383:8383
+    environment:
+      - JAVA_OPTS=
+        -DEUREKA_SERVER=http://golmal-discovery:8761/eureka
+    depends_on:
+      - golmal-discovery
+      - golmal-mongodb
+      - golmal-config-server
+    restart: on-failure
+  golmal-login:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: sushantpat11/golmal-login
+    ports:
+      - 8181:8181
+    environment:
+      - JAVA_OPTS=
+        -DEUREKA_SERVER=http://golmal-discovery:8761/eureka
+    restart: on-failure
+volumes:
+  mongodb:
+  mongoconfig:
